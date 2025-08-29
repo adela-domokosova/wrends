@@ -52,3 +52,4 @@ jobs:
             --baseDN dc=example,dc=com \
             "(uid=user.0)" | \
             grep -q "dn: uid=user.0,ou=People,dc=example,dc=com"
+
