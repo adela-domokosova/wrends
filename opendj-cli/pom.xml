@@ -35,6 +35,7 @@
         <dependency>
             <groupId>org.wrensecurity.wrends</groupId>
             <artifactId>opendj-core</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
