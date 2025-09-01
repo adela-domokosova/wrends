@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.wrensecurity</groupId>
         <artifactId>wrensec-parent</artifactId>
-        <version>3.5.1</version>
+        <version>4.2.0</version>
         <relativePath />
     </parent>
 
@@ -91,6 +91,8 @@
     </repositories>
 
     <properties>
+        <pgpVerifyKeysVersion>1.9.1</pgpVerifyKeysVersion>
+
         <product.name>Wren:DS</product.name>
         <product.name.lowercase>wrends</product.name.lowercase>
         <product.locales>ca_ES,es,de,fr,ja,ko,pl,zh_CN,zh_TW</product.locales>
@@ -99,6 +101,7 @@
         <freemarker.version>2.3.24-incubating</freemarker.version>
         <grizzly-framework.version>2.3.28</grizzly-framework.version>
         <metrics-core.version>3.1.2</metrics-core.version>
+        <wrensec-commons.version>22.3.0</wrensec-commons.version>
 
         <!-- OSGi bundles properties -->
         <opendj.osgi.import.additional />
@@ -115,26 +118,44 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.wrensecurity.wrends</groupId>
-                <artifactId>opendj-bom</artifactId>
-                <version>${project.version}</version>
-                <scope>import</scope>
-                <type>pom</type>
+                <groupId>com.github.stephenc.jcip</groupId>
+                <artifactId>jcip-annotations</artifactId>
+                <version>1.0-1</version>
             </dependency>
 
-            <!-- Dropwizard metrics-core -->
+	        <dependency>
+			    <groupId>com.sun.xml.ws</groupId>
+			    <artifactId>jaxws-ri</artifactId>
+			    <version>2.3.7</version>
+			    <type>pom</type>
+			    <scope>import</scope>
+			</dependency>
+
             <dependency>
                 <groupId>io.dropwizard.metrics</groupId>
                 <artifactId>metrics-core</artifactId>
                 <version>${metrics-core.version}</version>
             </dependency>
 
-            <!-- Commons Build Tools -->
             <dependency>
                 <groupId>org.wrensecurity</groupId>
                 <artifactId>wrensec-build-tools</artifactId>
-                <version>${wrenBuildToolsVersion}</version>
+                <version>${wrensecBuildToolsVersion}</version>
                 <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.wrensecurity.commons</groupId>
+                <artifactId>commons-bom</artifactId>
+                <version>${wrensec-commons.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+
+            <dependency>
+                <groupId>org.wrensecurity.commons</groupId>
+                <artifactId>i18n-slf4j</artifactId>
+                <version>${wrensec-commons.version}</version>
             </dependency>
 
             <dependency>
@@ -287,7 +308,7 @@
                     <?m2e execute onConfiguration?>
                     <groupId>org.wrensecurity.commons</groupId>
                     <artifactId>i18n-maven-plugin</artifactId>
-                    <version>22.3.0</version>
+                    <version>${wrensec-commons.version}</version>
                 </plugin>
 
                 <!-- This is needed to use annotations in maven plugins with maven 3.0.x -->
@@ -295,7 +316,6 @@
                     <?m2e execute onConfiguration?>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-plugin-plugin</artifactId>
-                    <version>3.2</version>
                     <configuration>
                         <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
                     </configuration>

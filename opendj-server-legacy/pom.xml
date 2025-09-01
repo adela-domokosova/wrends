@@ -71,11 +71,13 @@
         <dependency>
             <groupId>org.wrensecurity.wrends</groupId>
             <artifactId>opendj-cli</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.wrensecurity.wrends</groupId>
             <artifactId>opendj-rest2ldap</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -86,6 +88,7 @@
         <dependency>
             <groupId>org.wrensecurity.wrends</groupId>
             <artifactId>opendj-config</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -99,6 +102,7 @@
         <dependency>
             <groupId>org.wrensecurity.wrends</groupId>
             <artifactId>opendj-server</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

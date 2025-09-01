@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.wrensecurity</groupId>
         <artifactId>wrensec-parent</artifactId>
-        <version>3.5.1</version>
+        <version>4.2.0</version>
         <relativePath />
     </parent>
 
@@ -65,28 +65,8 @@
         </repository>
     </repositories>
 
-    <properties>
-        <wrensec-commons.version>22.3.0</wrensec-commons.version>
-    </properties>
-
     <dependencyManagement>
         <dependencies>
-            <!-- Wren Security BOM -->
-            <dependency>
-                <groupId>org.wrensecurity.commons</groupId>
-                <artifactId>commons-bom</artifactId>
-                <version>${wrensec-commons.version}</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-
-            <!-- I18N framework -->
-            <dependency>
-                <groupId>org.wrensecurity.commons</groupId>
-                <artifactId>i18n-slf4j</artifactId>
-                <version>${wrensec-commons.version}</version>
-            </dependency>
-
             <!-- Wren:DS SDK -->
             <dependency>
                 <groupId>org.wrensecurity.wrends</groupId>
@@ -110,13 +90,6 @@
                 <groupId>org.wrensecurity.wrends</groupId>
                 <artifactId>opendj-rest2ldap</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-
-            <!-- Other -->
-            <dependency>
-                <groupId>com.github.stephenc.jcip</groupId>
-                <artifactId>jcip-annotations</artifactId>
-                <version>1.0-1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
