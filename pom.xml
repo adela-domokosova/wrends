@@ -91,6 +91,12 @@
     </repositories>
 
     <properties>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.java.jacoco.reportPaths>target/jacoco.xml</sonar.java.jacoco.reportPaths>
+        <sonar.java.pmd.reportPaths>target/pmd.xml</sonar.java.pmd.reportPaths>
+        <sonar.java.checkstyle.reportPaths>target/checkstyle-result.xml</sonar.java.checkstyle.reportPaths>
+        <sonar.java.spotbugs.reportPaths>target/spotbugs.xml</sonar.java.spotbugs.reportPaths>
+        <sonar.organization>adela-domokosova</sonar.organization>
         <pgpVerifyKeysVersion>1.9.1</pgpVerifyKeysVersion>
 
         <product.name>Wren:DS</product.name>
