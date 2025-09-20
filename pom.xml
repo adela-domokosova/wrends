@@ -13,7 +13,7 @@
   information: "Portions Copyright [year] [name of copyright owner]".
 
   Copyright 2011-2016 ForgeRock AS.
-  Portions Copyright 2017-2022 Wren Security.
+  Portions Copyright 2017-2025 Wren Security.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -91,13 +91,14 @@
     </repositories>
 
     <properties>
-        <pgpVerifyKeysVersion>1.9.1</pgpVerifyKeysVersion>
+        <pgpVerifyKeysVersion>1.9.3</pgpVerifyKeysVersion>
 
         <product.name>Wren:DS</product.name>
         <product.name.lowercase>wrends</product.name.lowercase>
         <product.locales>ca_ES,es,de,fr,ja,ko,pl,zh_CN,zh_TW</product.locales>
         <localized.jars.classifier>i18n</localized.jars.classifier>
 
+        <bouncycastle.version>1.81</bouncycastle.version>
         <freemarker.version>2.3.24-incubating</freemarker.version>
         <grizzly-framework.version>2.3.28</grizzly-framework.version>
         <metrics-core.version>3.1.2</metrics-core.version>
@@ -182,6 +183,18 @@
                 <groupId>org.wrensecurity.wrends</groupId>
                 <artifactId>opendj-server</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

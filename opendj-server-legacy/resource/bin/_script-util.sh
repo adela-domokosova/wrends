@@ -184,10 +184,6 @@ set_environment_vars() {
        LD_PRELOAD LD_PRELOAD_32 LD_PRELOAD_64
   SCRIPT_NAME_ARG=-Dorg.opends.server.scriptName=${SCRIPT_NAME}
 	export SCRIPT_NAME_ARG
-  JAVA_MAJOR_VERSION=$("$OPENDJ_JAVA_BIN" -version 2>&1 | sed -E 's/.*version "([0-9]+).*/\1/; 1q')
-  if [ "$JAVA_MAJOR_VERSION" -ge 11 ]; then
-    export OPENDJ_JAVA_ARGS="$OPENDJ_JAVA_ARGS --add-exports java.base/sun.security.x509=ALL-UNNAMED --add-exports java.base/sun.security.tools.keytool=ALL-UNNAMED"
-  fi
 }
 
 # Configure the appropriate CLASSPATH for server, using Opend DJ logger.
