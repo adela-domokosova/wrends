@@ -13,15 +13,81 @@
  *
  * Copyright 2008-2010 Sun Microsystems, Inc.
  * Portions Copyright 2013-2016 ForgeRock AS.
+ * Portions Copyright 2025 Wren Security.
  */
 package org.opends.guitools.controlpanel.ui;
 
-import static com.forgerock.opendj.cli.Utils.*;
-
-import static org.forgerock.opendj.ldap.schema.SchemaValidationPolicy.*;
-import static org.opends.messages.AdminToolMessages.*;
-import static org.opends.server.util.CollectionUtils.*;
-import static org.opends.server.util.ServerConstants.*;
+import static com.forgerock.opendj.cli.Utils.OBFUSCATED_VALUE;
+import static org.forgerock.opendj.ldap.schema.SchemaValidationPolicy.defaultPolicy;
+import static org.forgerock.opendj.ldap.schema.SchemaValidationPolicy.ignoreAll;
+import static org.opends.messages.AdminToolMessages.ERR_CTRL_PANEL_ATTRIBUTE_REQUIRED;
+import static org.opends.messages.AdminToolMessages.ERR_CTRL_PANEL_DN_NOT_VALID;
+import static org.opends.messages.AdminToolMessages.ERR_CTRL_PANEL_ERROR_CHECKING_ENTRY;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_ADD_MEMBERS_BUTTON;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_ADD_MEMBERS_LABEL;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_AUTHPASSWORD_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_BROWSE_BUTTON_LABEL;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_CHOOSE_ENTRIES;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_CHOOSE_REFERENCE_GROUP;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_CN_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_C_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_DESCRIPTION_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_DS_TARGET_GROUP_DN_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_EMPLOYEENUMBER_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_FACSIMILETELEPHONENUMBER_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_GIVENNAME_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_HOMEPHONE_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_JPEGPHOTO_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_L_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_MAIL_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_MEMBERURL_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_MEMBER_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_MOBILE_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_NAME_LABEL;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_NAMINGCONTEXTS_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_OBJECTCLASS_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_PAGER_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_POSTALADDRESS_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_POSTALCODE_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_PRIVATENAMINGCONTEXTS_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_SHOW_ATTRS_WITH_VALUES_LABEL;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_SN_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_STREET_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_ST_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_SUPPORTEDCONTROLS_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_SUPPORTEDEXTENSIONS_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_SUPPORTEDFEATURES_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_SUPPORTEDLDAPVERSIONS_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_SUPPORTEDPWDSCHEMES_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_TELEPHONENUMBER_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_UID_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_UNIQUEMEMBER_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_USERCERTIFICATE_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_USERPASSWORD_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_VENDORNAME_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_VENDORVERSION_FRIENDLY_NAME;
+import static org.opends.messages.AdminToolMessages.INFO_CTRL_PANEL_VIEW_BUTTON_LABEL;
+import static org.opends.server.util.CollectionUtils.newArrayList;
+import static org.opends.server.util.ServerConstants.ATTR_C;
+import static org.opends.server.util.ServerConstants.ATTR_COMMON_NAME;
+import static org.opends.server.util.ServerConstants.ATTR_DC;
+import static org.opends.server.util.ServerConstants.ATTR_MEMBER;
+import static org.opends.server.util.ServerConstants.ATTR_MEMBER_URL_LC;
+import static org.opends.server.util.ServerConstants.ATTR_NAMING_CONTEXTS_LC;
+import static org.opends.server.util.ServerConstants.ATTR_O;
+import static org.opends.server.util.ServerConstants.ATTR_OU;
+import static org.opends.server.util.ServerConstants.ATTR_PRIVATE_NAMING_CONTEXTS;
+import static org.opends.server.util.ServerConstants.ATTR_SUPPORTED_AUTH_PW_SCHEMES_LC;
+import static org.opends.server.util.ServerConstants.ATTR_SUPPORTED_CONTROL_LC;
+import static org.opends.server.util.ServerConstants.ATTR_SUPPORTED_EXTENSION_LC;
+import static org.opends.server.util.ServerConstants.ATTR_SUPPORTED_FEATURE_LC;
+import static org.opends.server.util.ServerConstants.ATTR_SUPPORTED_LDAP_VERSION_LC;
+import static org.opends.server.util.ServerConstants.ATTR_UNIQUE_MEMBER_LC;
+import static org.opends.server.util.ServerConstants.ATTR_VENDOR_NAME_LC;
+import static org.opends.server.util.ServerConstants.ATTR_VENDOR_VERSION_LC;
+import static org.opends.server.util.ServerConstants.OBJECTCLASS_ATTRIBUTE_TYPE_NAME;
+import static org.opends.server.util.ServerConstants.OC_GROUP_OF_NAMES_LC;
+import static org.opends.server.util.ServerConstants.OC_GROUP_OF_URLS_LC;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -39,6 +105,7 @@ import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.io.StringReader;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +119,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -69,7 +135,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 import javax.swing.tree.TreePath;
-
 import org.forgerock.i18n.LocalizableMessage;
 import org.forgerock.i18n.LocalizableMessageBuilder;
 import org.forgerock.opendj.ldap.AVA;
@@ -93,6 +158,7 @@ import org.opends.guitools.controlpanel.event.ScrollPaneBorderListener;
 import org.opends.guitools.controlpanel.task.OnlineUpdateException;
 import org.opends.guitools.controlpanel.ui.components.BinaryCellPanel;
 import org.opends.guitools.controlpanel.ui.components.ObjectClassCellPanel;
+import org.opends.guitools.controlpanel.ui.components.PasswordCellPanel;
 import org.opends.guitools.controlpanel.ui.nodes.BrowserNodeInfo;
 import org.opends.guitools.controlpanel.ui.nodes.DndBrowserNodes;
 import org.opends.guitools.controlpanel.util.Utilities;
@@ -113,13 +179,15 @@ class SimplifiedViewEntryPanel extends ViewEntryPanel
   private ObjectClassEditorPanel editOcPanel;
   private JLabel requiredLabel;
   private JCheckBox showOnlyAttrsWithValues;
+  private GenericDialog editPasswordDlg;
+  private PasswordEditorPanel editPasswordPanel;
 
   private DropTargetListener dropTargetListener;
 
   private GenericDialog browseEntriesDlg;
   private LDAPEntrySelectionPanel browseEntriesPanel;
 
-  private final Map<String, List<String>> lastUserPasswords = new HashMap<>();
+  private final Map<String, List<String>> changedUserPasswords = new HashMap<>();
 
   private Entry searchResult;
   private boolean isReadOnly;
@@ -132,8 +200,6 @@ class SimplifiedViewEntryPanel extends ViewEntryPanel
   private final Map<String, JComponent> hmLabels = new HashMap<>();
   private final Map<String, String> hmDisplayedNames = new HashMap<>();
   private final Map<String, JComponent> hmComponents = new HashMap<>();
-
-  private final String CONFIRM_PASSWORD = "opendj-confirm-password";
 
   /** Map containing as key the attribute name and as value a localizable message. */
   private static final Map<String, LocalizableMessage> hmFriendlyAttrNames = new HashMap<>();
@@ -406,13 +472,24 @@ class SimplifiedViewEntryPanel extends ViewEntryPanel
   @Override
   public void update(Entry sr, boolean isReadOnly, TreePath path)
   {
+    // drop password updates when the entry id updated
+    changedUserPasswords.clear();
+
+    // do standard panel update / repaint
+    updateInteral(sr, isReadOnly, path);
+  }
+
+  private void updateInteral(Entry sr, boolean isReadOnly, TreePath path)
+  {
     boolean sameEntry = false;
     if (searchResult != null && sr != null)
     {
       sameEntry = searchResult.getName().equals(sr.getName());
     }
-    final Point p = sameEntry ?
-        scrollAttributes.getViewport().getViewPosition() : new Point(0, 0);
+
+    final Point scrollPosition = sameEntry
+        ? scrollAttributes.getViewport().getViewPosition() : new Point(0, 0);
+
     searchResult = sr;
     this.isReadOnly = isReadOnly;
     this.treePath = path;
@@ -427,7 +504,6 @@ class SimplifiedViewEntryPanel extends ViewEntryPanel
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.fill = GridBagConstraints.HORIZONTAL;
 
-    lastUserPasswords.clear();
     hmEditors.clear();
 
     hmLabels.clear();
@@ -475,17 +551,6 @@ class SimplifiedViewEntryPanel extends ViewEntryPanel
           values = newArrayList(ByteString.empty());
         }
 
-        final boolean isPasswordAttr = isPassword(attrName);
-        if (isPasswordAttr)
-        {
-          List<String> pwds = new ArrayList<>();
-          for (ByteString v : values)
-          {
-            pwds.add(getPasswordStringValue(attrName, v));
-          }
-          lastUserPasswords.put(lcAttr, pwds);
-        }
-
         JComponent comp = getReadWriteComponent(attrName, values);
         gbc.weightx = 0.0;
         gbc.anchor = anchor2(attrName, values);
@@ -499,28 +564,6 @@ class SimplifiedViewEntryPanel extends ViewEntryPanel
         gbc.insets.top = 10;
         hmLabels.put(lcAttr, label);
         hmComponents.put(lcAttr, comp);
-
-        if (isPasswordAttr)
-        {
-          label = Utilities.createPrimaryLabel(
-              INFO_CTRL_PANEL_PASSWORD_CONFIRM_LABEL.get());
-          String key = getConfirmPasswordKey(attrName);
-          comp = getReadWriteComponent(key, values);
-
-          hmLabels.put(key, label);
-          hmComponents.put(key, comp);
-
-          gbc.weightx = 0.0;
-          gbc.anchor = isSingleValue(attrName) ? GridBagConstraints.WEST : GridBagConstraints.NORTHWEST;
-          gbc.insets.left = 0;
-          gbc.gridwidth = GridBagConstraints.RELATIVE;
-          attributesPanel.add(label, gbc);
-          gbc.insets.left = 10;
-          gbc.weightx = 1.0;
-          gbc.gridwidth = GridBagConstraints.REMAINDER;
-          attributesPanel.add(comp, gbc);
-          gbc.insets.top = 10;
-        }
       }
     }
     gbc.weighty = 1.0;
@@ -544,9 +587,9 @@ class SimplifiedViewEntryPanel extends ViewEntryPanel
       @Override
       public void run()
       {
-        if (p != null && scrollAttributes.getViewport().contains(p))
+        if (scrollPosition != null && scrollAttributes.getViewport().contains(scrollPosition))
         {
-          scrollAttributes.getViewport().setViewPosition(p);
+          scrollAttributes.getViewport().setViewPosition(scrollPosition);
         }
         ignoreEntryChangeEvents = false;
       }
@@ -924,7 +967,6 @@ class SimplifiedViewEntryPanel extends ViewEntryPanel
     hmEditors.put(attrName.toLowerCase(), components);
 
     final Schema schema = getInfo().getServerDescriptor().getSchema();
-    boolean isBinary = isBinary(attrName);
     for (ByteString v : values)
     {
       gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -981,17 +1023,50 @@ class SimplifiedViewEntryPanel extends ViewEntryPanel
         components.add(new EditorComponent(ocCellPanel));
         break;
       }
-      else if (isPassword(attrName) || isConfirmPassword(attrName))
+      else if (isPassword(attrName))
       {
-        JPasswordField pf = Utilities.createPasswordField();
-        if (!"".equals(v))
+        final JPasswordField pf = Utilities.createPasswordField();
+        pf.setVisible(false);
+        final List<String> newPwds = changedUserPasswords.get(attrName.toLowerCase());
+        if (!v.isEmpty() || (newPwds != null && !newPwds.isEmpty()))
         {
           pf.setText(getPasswordStringValue(attrName, v));
         }
-        panel.add(pf, gbc);
         components.add(new EditorComponent(pf));
+
+        final PasswordCellPanel pwCellPanel = new PasswordCellPanel();
+        pwCellPanel.setHasPassword(!v.isEmpty());
+        pwCellPanel.addEditActionListener(new ActionListener()
+        {
+          @Override
+          public void actionPerformed(ActionEvent ev)
+          {
+            if (editPasswordDlg == null)
+            {
+              editPasswordPanel = new PasswordEditorPanel();
+              editPasswordPanel.setInfo(getInfo());
+              editPasswordDlg = new GenericDialog(
+                      Utilities.getFrame(SimplifiedViewEntryPanel.this),
+                      editPasswordPanel);
+              editPasswordDlg.setModal(true);
+              Utilities.centerGoldenMean(editPasswordDlg,
+                      Utilities.getParentDialog(SimplifiedViewEntryPanel.this));
+            }
+            editPasswordDlg.pack();
+            editPasswordDlg.setVisible(true);
+            if (editPasswordPanel.valueChanged())
+            {
+              String newPwd = editPasswordPanel.getNewPassword();
+              changedUserPasswords.put(attrName.toLowerCase(), List.of(newPwd));
+              pwCellPanel.setHasPassword(!newPwd.isEmpty());
+              notifyListeners();
+            }
+          }
+        });
+        panel = pwCellPanel;
+        break;
       }
-      else if (!isBinary)
+      else if (!isBinary(attrName))
       {
         if (isSingleValue(attrName))
         {
@@ -1184,22 +1259,6 @@ class SimplifiedViewEntryPanel extends ViewEntryPanel
       setPrimaryValid(mapEntry.getValue());
     }
 
-    // Check passwords
-    for (String attrName : lastUserPasswords.keySet())
-    {
-      List<String> pwds = getNewPasswords(attrName);
-      List<String> confirmPwds = getConfirmPasswords(attrName);
-      if (!pwds.equals(confirmPwds))
-      {
-        setPrimaryInvalid(hmLabels.get(attrName));
-        setPrimaryInvalid(hmLabels.get(getConfirmPasswordKey(attrName)));
-        LocalizableMessage msg = ERR_CTRL_PANEL_PASSWORD_DO_NOT_MATCH.get();
-        if (!errors.contains(msg))
-        {
-          errors.add(msg);
-        }
-      }
-    }
     for (String attrName : requiredAttrs)
     {
       if (getValues(attrName).isEmpty())
@@ -1215,7 +1274,7 @@ class SimplifiedViewEntryPanel extends ViewEntryPanel
     }
 
     final String ldif = getLDIF();
-    try (LDIFEntryReader reader = new LDIFEntryReader(ldif)
+    try (LDIFEntryReader reader = new LDIFEntryReader(new StringReader(ldif))
         .setSchemaValidationPolicy(checkSchema() ? defaultPolicy():ignoreAll()))
     {
       final Entry entry = reader.readEntry();
@@ -1264,28 +1323,6 @@ class SimplifiedViewEntryPanel extends ViewEntryPanel
     return values;
   }
 
-  private List<String> getNewPasswords(String attrName)
-  {
-    AttributeDescription attrDesc = AttributeDescription.valueOf(attrName);
-    return getDisplayedStringValues(attrDesc.getNameOrOID());
-  }
-
-  private List<String> getConfirmPasswords(String attrName)
-  {
-    return getDisplayedStringValues(getConfirmPasswordKey(attrName));
-  }
-
-  private String getConfirmPasswordKey(String attrName)
-  {
-    AttributeDescription attrDesc = AttributeDescription.valueOf(attrName);
-    return CONFIRM_PASSWORD + attrDesc.getNameOrOID().toLowerCase();
-  }
-
-  private boolean isConfirmPassword(String key)
-  {
-    return key.startsWith(CONFIRM_PASSWORD);
-  }
-
   /**
    * Returns the LDIF representation of the displayed entry.
    * @return the LDIF representation of the displayed entry.
@@ -1297,14 +1334,11 @@ class SimplifiedViewEntryPanel extends ViewEntryPanel
 
     for (String attrName : hmEditors.keySet())
     {
-      if (isConfirmPassword(attrName))
+      if (isPassword(attrName))
       {
-        continue;
-      }
-      else if (isPassword(attrName))
-      {
-        List<String> newPwds = getNewPasswords(attrName);
-        if (newPwds.equals(lastUserPasswords.get(attrName.toLowerCase())))
+        List<String> newPwds = changedUserPasswords.get(attrName.toLowerCase());
+        List<Object> oldPwds = getValues(attrName);
+        if (newPwds == null || newPwds.equals(oldPwds))
         {
           Attribute oldValues = searchResult.getAttribute(attrName);
           if (oldValues != null && !oldValues.isEmpty())
@@ -1314,14 +1348,13 @@ class SimplifiedViewEntryPanel extends ViewEntryPanel
         }
         else
         {
-          appendLDIFLines(sb, attrName);
+          appendLDIFLines(sb, attrName, newPwds);
         }
       }
-      else
-        if (!schemaReadOnlyAttributesLowerCase.contains(attrName.toLowerCase()))
-        {
-          appendLDIFLines(sb, attrName);
-        }
+      else if (!schemaReadOnlyAttributesLowerCase.contains(attrName.toLowerCase()))
+      {
+        appendLDIFLines(sb, attrName);
+      }
     }
 
     // Add the attributes that are not displayed
@@ -1420,7 +1453,7 @@ class SimplifiedViewEntryPanel extends ViewEntryPanel
             for (Map.Entry<String, List<EditorComponent>> entry : hmEditors.entrySet())
             {
               String attrName = entry.getKey();
-              if (isPassword(attrName) || isConfirmPassword(attrName))
+              if (isPassword(attrName))
               {
                 continue;
               }
@@ -1636,31 +1669,16 @@ class SimplifiedViewEntryPanel extends ViewEntryPanel
         String attrNoOptions = AttributeDescription.valueOf(attrName).getNameOrOID();
         if (!attributes.contains(attrNoOptions))
         {
+          changedUserPasswords.remove(attrNoOptions.toLowerCase());
           continue;
         }
-        if (isPassword(attrName))
-        {
-          List<String> newPwds = getNewPasswords(attrName);
-          if (newPwds.equals(lastUserPasswords.get(attrName)))
-          {
-            Attribute oldValues = searchResult.getAttribute(attrName);
-            final Attribute newAttr =
-                oldValues != null ? new LinkedAttribute(oldValues) : new LinkedAttribute(attrName);
-            newResult.removeAttribute(newAttr.getAttributeDescription());
-            newResult.addAttribute(newAttr);
-          }
-          else
-          {
-            setValues(newResult, attrName);
-          }
-        }
-        else if (!schemaReadOnlyAttributesLowerCase.contains(attrName.toLowerCase()))
+        if (!schemaReadOnlyAttributesLowerCase.contains(attrName.toLowerCase()))
         {
           setValues(newResult, attrName);
         }
       }
     }
-    update(newResult, isReadOnly, treePath);
+    updateInteral(newResult, isReadOnly, treePath);
     ignoreEntryChangeEvents = false;
     searchResult = oldResult;
     notifyListeners();
