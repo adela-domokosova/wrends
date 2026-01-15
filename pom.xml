@@ -91,7 +91,7 @@
     </repositories>
 
     <properties>
-        <pgpVerifyKeysVersion>1.9.3</pgpVerifyKeysVersion>
+        <pgpVerifyKeysVersion>1.9.7</pgpVerifyKeysVersion>
 
         <product.name>Wren:DS</product.name>
         <product.name.lowercase>wrends</product.name.lowercase>
